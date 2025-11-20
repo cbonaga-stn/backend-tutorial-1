@@ -153,6 +153,9 @@ const updatePlace = async (req, res, next) => {
 };
 
 const deletePlace = async (req, res, next) => {
+  console.log('DELETE request received for:', req.params.pid);
+  const placeId = req.params.pid;
+
   let place;
   try {
     place = await Place.findById(placeId).populate("creator");
@@ -170,7 +173,6 @@ const deletePlace = async (req, res, next) => {
     return next(new HttpError("Could not delete place.", 500));
   }
 
-  // Cleanup uploaded file
   fs.unlink(imagePath, (err) => {
     console.log("Place image cleanup:", err || "Deleted successfully");
   });
