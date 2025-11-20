@@ -34,6 +34,9 @@ const signup = async (req, res, next) => {
       new HttpError("Invalid inputs passed, please check your data.", 422)
     );
   }
+
+  console.log(req.file);   // Console.log to verify file upload
+
   const { name, email, password, places } = req.body;
 
   let existingUser;
@@ -58,8 +61,7 @@ const signup = async (req, res, next) => {
   const createdUser = new User({
     name,
     email,
-    image:
-      "https://img.freepik.com/free-vector/user-circles-set_78370-4704.jpg?semt=ais_incoming&w=740&q=80",
+    image: req.file.path, // Store the path of the uploaded image
     password,
     places,
   });

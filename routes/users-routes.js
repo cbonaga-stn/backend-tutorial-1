@@ -1,21 +1,13 @@
+// Routes for user authentication including signup with image upload
 const express = require("express");
-const { check } = require("express-validator");
-
+const fileUpload = require("../middleware/file-upload");
 const usersController = require("../controllers/users-controllers");
 
 const router = express.Router();
 
-router.get("/", usersController.getUsers);
-
 router.post(
   "/signup",
-  [
-    check("name").not().isEmpty(),
-    check("email")
-      .normalizeEmail() // Test@test.com => test@test.com
-      .isEmail(),
-    check("password").isLength({ min: 6 }),
-  ],
+  fileUpload.single("image"),  // ← Multer extracts req.file
   usersController.signup
 );
 

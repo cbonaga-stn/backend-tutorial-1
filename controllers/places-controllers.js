@@ -1,6 +1,8 @@
 const { v7: uuid } = require("uuid");
 const { validationResult } = require("express-validator");
 
+const fs = require('fs');   // File system module for deleting files
+
 const getCoordsForAddress = require("../util/geocode");
 const Place = require("../models/place");
 const HttpError = require("../models/http-error");
@@ -99,8 +101,7 @@ const createPlace = async (req, res, next) => {
     title,
     description,
     location: coordinates,
-    image:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSpPkm3Hhfm2fa7zZFgK0HQrD8yvwSBmnm_Gw&s",
+    image: req.file.path, // Use the path of the uploaded image
     address,
     creator,
   });
@@ -152,30 +153,29 @@ const updatePlace = async (req, res, next) => {
 };
 
 const deletePlace = async (req, res, next) => {
-  const placeId = req.params.pid;
-
   let place;
   try {
-    place = await Place.findById(placeId);
+    place = await Place.findById(placeId).populate("creator");
   } catch (err) {
-    const error = new HttpError(
-      "Something went wrong, could not delete place.",
-      500
-    );
-    return next(error);
+    return next(new HttpError("Could not find place.", 500));
   }
+
+  const imagePath = place.image;
 
   try {
-    await place.deleteOne();
+    await place.remove();
+    place.creator.places.pull(placeId);
+    await place.creator.save();
   } catch (err) {
-    const error = new HttpError(
-      "Something went wrong, could not delete place.",
-      500
-    );
-    return next(error);
+    return next(new HttpError("Could not delete place.", 500));
   }
 
-  res.status(200).json({ message: "Deleted place." });
+  // Cleanup uploaded file
+  fs.unlink(imagePath, (err) => {
+    console.log("Place image cleanup:", err || "Deleted successfully");
+  });
+
+  res.status(200).json({ message: "Place removed." });
 };
 
 exports.getPlaceById = getPlaceById;
