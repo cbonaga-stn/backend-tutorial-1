@@ -14,7 +14,7 @@ router.get('/user/:uid', placesControllers.getPlacesByUserId);
 router.post(
   "/",
   fileUpload.single("image"),  // Accept place image
-  placesController.createPlace
+  placesControllers.createPlace
 );
 
 router.patch(
