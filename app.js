@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config();
 
 const path = require("path");
 
@@ -27,6 +27,7 @@ app.use((req, res, next) => {
     'Origin, X-Requested-With, Content-Type, Accept, Authorization'
   );
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE');
+
   next();
 });
 
@@ -53,10 +54,11 @@ app.use((error, req, res, next) => {
 });
 
 mongoose
-  .connect(process.env.DB_URL)
+  .connect(process.env.MONGODB_URI)
   .then(() => {
-    app.listen(5005);
+    app.listen(process.env.PORT || 5005);
+    console.log('Connected to MongoDB');
   })
-  .catch((err) => {
-    console.log(err);
+  .catch(err => {
+    console.log('MongoDB connection error:', err);
   });
