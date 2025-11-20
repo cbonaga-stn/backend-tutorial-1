@@ -54,7 +54,7 @@ app.use((error, req, res, next) => {
 });
 
 mongoose
-  .connect(process.env.DB_URL)
+  .connect()
   .then(() => {
     app.listen(5005);
   })
