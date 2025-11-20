@@ -150,34 +150,40 @@ const updatePlace = async (req, res, next) => {
   }
 
   res.status(200).json({ place: place.toObject({ getters: true }) });
-};
+}; 
 
 const deletePlace = async (req, res, next) => {
-  console.log('DELETE request received for:', req.params.pid);
   const placeId = req.params.pid;
+  console.log('DELETE request received for:', placeId);
 
   let place;
   try {
-    place = await Place.findById(placeId).populate("creator");
+    place = await Place.findById(placeId).populate('creator');
+    if (!place) {
+      return next(new HttpError('Place not found.', 404));
+    }
   } catch (err) {
-    return next(new HttpError("Could not find place.", 500));
+    return next(new HttpError('Fetching place failed.', 500));
   }
 
-  const imagePath = place.image;
+  const imagePath = path.join(__dirname, '..', place.image);
+  console.log('Image path:', imagePath);
 
   try {
     await place.remove();
-    place.creator.places.pull(placeId);
-    await place.creator.save();
+    if (place.creator) {
+      place.creator.places.pull(placeId);
+      await place.creator.save();
+    }
   } catch (err) {
-    return next(new HttpError("Could not delete place.", 500));
+    return next(new HttpError('Deleting place failed.', 500));
   }
 
-  fs.unlink(imagePath, (err) => {
-    console.log("Place image cleanup:", err || "Deleted successfully");
+  fs.unlink(imagePath, err => {
+    console.log('Image deletion:', err || 'Success');
   });
 
-  res.status(200).json({ message: "Place removed." });
+  res.status(200).json({ message: 'Place deleted.' });
 };
 
 exports.getPlaceById = getPlaceById;
