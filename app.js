@@ -56,10 +56,10 @@ app.use((error, req, res, next) => {
 mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => {
-    app.listen(process.env.PORT || 5005);
-    console.log('Connected to MongoDB');
+    const PORT = process.env.PORT || 5005;
+    app.listen(PORT, () => {
+      console.log(`API running on port ${PORT}`);
+    });
   })
-  .catch(err => {
-    console.log('MongoDB connection error:', err);
-  });
+
   

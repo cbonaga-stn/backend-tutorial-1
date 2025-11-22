@@ -158,7 +158,7 @@ const deletePlace = async (req, res, next) => {
 
   let place;
   try {
-    place = await Place.findById(placeId).populate('creator');
+    place = await Place.findById(placeId);
     if (!place) {
       return next(new HttpError('Place not found.', 404));
     }
@@ -170,19 +170,12 @@ const deletePlace = async (req, res, next) => {
   console.log('Image path:', imagePath);
 
   try {
-    await place.remove();
-    if (place.creator) {
-      place.creator.places.pull(placeId);
-      await place.creator.save();
-    }
+    await Place.findByIdAndDelete(placeId);
+    await fs.promises.unlink(imagePath);
+    console.log('Image deleted successfully');
   } catch (err) {
     return next(new HttpError('Deleting place failed.', 500));
   }
-
-  fs.unlink(imagePath, err => {
-    console.log('Image deletion:', err || 'Success');
-  });
-
   res.status(200).json({ message: 'Place deleted.' });
 };
 
