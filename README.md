@@ -137,3 +137,7 @@ No API key required — keep usage light and always retain attribution.
 ```
 
 ---
+
+## AI Usage Note
+
+I acknowledge using AI in the coding process. I wrote the code with AI's help, which aided my understanding of the tasks and the code's purpose and function. I provided instructions based on the task and desired outcome, and AI assisted me in accomplishing it. AI also helped me identify and fix errors, eventually making the code work.
